@@ -18,7 +18,7 @@
   [seed]
   (if seed
     [seed (gen/random seed)]
-    (let [non-nil-seed (System/currentTimeMillis)]
+    (let [non-nil-seed (Environment/TickCount)]           ;;; System/currentTimeMillis
       [non-nil-seed (gen/random non-nil-seed)])))
 
 (defn- complete
@@ -29,7 +29,7 @@
 (defn not-falsey-or-exception?
   "True if the value is not falsy or an exception"
   [value]
-  (and value (not (instance? Throwable value))))
+  (and value (not (instance? Exception value))))               ;;; Throwable
 
 (defn quick-check
   "Tests `property` `num-tests` times.

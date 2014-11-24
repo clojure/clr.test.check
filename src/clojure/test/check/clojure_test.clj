@@ -13,7 +13,7 @@
 (defn- assert-check
   [{:keys [result] :as m}]
   (prn m)
-  (if (instance? Throwable result)
+  (if (instance? Exception result)                            ;;; Throwable
     (throw result)
     (ct/is result)))
 
@@ -94,7 +94,7 @@
 
 (let [begin-test-var-method (get-method ct/report :begin-test-var)]
   (defmethod ct/report :begin-test-var [m]
-    (reset! last-trial-report (System/currentTimeMillis))
+    (reset! last-trial-report (Environment/TickCount))                ;;; System/currentTimeMillis
     (when begin-test-var-method (begin-test-var-method m))))
 
 (defn- get-property-name
@@ -107,7 +107,7 @@
 
   Passing trial 3286 / 5000 for (your-test-var-name-here) (:)"
   [m]
-  (let [t (System/currentTimeMillis)]
+  (let [t (Environment/TickCount)]                                      ;;; System/currentTimeMillis
     (when (> (- t *trial-report-period*) @last-trial-report)
       (ct/with-test-out
         (println "Passing trial" (-> m ::trial first) "/" (-> m ::trial second)

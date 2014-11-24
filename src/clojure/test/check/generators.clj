@@ -8,11 +8,11 @@
 ;   You must not remove this notice, or any other, from this software.
 
 (ns clojure.test.check.generators
-  (:import java.util.Random)
+  (:import System.Random)                                                    ;;; java.util.Random
   (:refer-clojure :exclude [int vector list hash-map map keyword
                             char boolean byte bytes sequence
                             shuffle not-empty symbol namespace])
-  (:require [clojure.core :as core]
+  (:require [clojure.core :as core]      clojure.string                     ;;; added clojure.string
             [clojure.test.check.rose-tree :as rose]))
 
 
@@ -159,8 +159,8 @@
 (defn- rand-range
   [^Random rnd lower upper]
   {:pre [(<= lower upper)]}
-  (let [factor (.nextDouble rnd)]
-    (long (Math/floor (+ lower (- (* factor (+ 1.0 upper))
+  (let [factor (.NextDouble rnd)]                                ;;; .nextDouble
+    (long (Math/Floor (+ lower (- (* factor (+ 1.0 upper))       ;;; Math/floor
                                   (* factor lower)))))))
 
 (defn sized
@@ -343,7 +343,7 @@
 
 (def nat
   "Generates natural numbers, starting at zero. Shrinks to zero."
-  (fmap #(Math/abs (long %)) int))
+  (fmap #(Math/Abs (long %)) int))                                      ;;; Math/abs
 
 (def pos-int
   "Generate positive integers bounded by the generator's `size` parameter."
@@ -431,7 +431,7 @@
 
 (def byte
   "Generates `java.lang.Byte`s, using the full byte-range."
-  (fmap core/byte (choose Byte/MIN_VALUE Byte/MAX_VALUE)))
+  (fmap core/byte (choose Byte/MinValue Byte/MaxValue)))                ;;; Byte/MIN_VALUE Byte/MAX_VALUE
 
 (def bytes
   "Generates byte-arrays."
@@ -528,11 +528,11 @@
 
   Symbols that start with +3 or -2 are not readable because they look
   like numbers."
-  [c ^Character d]
+  [c  d]                                          ;;; ^Character  -- not sure how this got in
   (core/boolean (and d
                      (or (= \+ c)
                          (= \- c))
-                     (Character/isDigit d))))
+                     (Char/IsDigit ^Char d))))          ;;; Character/isDigit
 
 (def ^{:private true} namespace-segment
   "Generate the segment of a namespace."
@@ -648,7 +648,7 @@
           "Second arg to recursive-gen must be a generator")
   (sized (fn [size]
            (bind (choose 1 5)
-                 (fn [height] (let [children-size (Math/pow size (/ 1 height))]
+                 (fn [height] (let [children-size (Math/Pow size (/ 1 height))]            ;;; Math/pow
                                 (recursive-helper container-gen-fn scalar-gen size
                                                   children-size height)))))))
 
