@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("clr.test.check")]
+[assembly: AssemblyTitle("clojure.test.check")]
 [assembly: AssemblyDescription("Property-based testing of Clojure code")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("David Miller")]
-[assembly: AssemblyProduct("clr.test.check")]
+[assembly: AssemblyProduct("clojure.test.check")]
 [assembly: AssemblyCopyright("Copyright © David Miller 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.6.1.0")]
-[assembly: AssemblyFileVersion("0.6.1.0")]
+[assembly: AssemblyVersion("0.6.1.1")]
+[assembly: AssemblyFileVersion("0.6.1.1")]
