@@ -20,7 +20,7 @@
   (prop/for-all* [gen/int] (constantly true)))
 
 (defspec long-running-spec 1000
-  (prop/for-all* [] #(do (Thread/sleep 1) true)))
+  (prop/for-all* [] #(do (System.Threading.Thread/Sleep 1) true)))                    ;;; Thread/sleep
 
 (defn- vector-elements-are-unique*
   [v]

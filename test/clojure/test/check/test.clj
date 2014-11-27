@@ -258,11 +258,11 @@
     (testing "keyword"              (t gen/keyword clojure.lang.Keyword))
     (testing "ratio"                (t gen/ratio   clojure.lang.Ratio))
     (testing "byte"                 (t gen/byte    Byte))
-    (testing "bytes"                (t gen/bytes   (Class/forName "[B")))
+    (testing "bytes"                (t gen/bytes   |System.Byte[]|))                      ;;; (Class/forName "[B")
 
-    (testing "char"                 (t gen/char                 Character))
-    (testing "char-ascii"           (t gen/char-ascii           Character))
-    (testing "char-alphanumeric"    (t gen/char-alphanumeric    Character))
+    (testing "char"                 (t gen/char                 Char))                    ;;; Character
+    (testing "char-ascii"           (t gen/char-ascii           Char))                    ;;; Character
+    (testing "char-alphanumeric"    (t gen/char-alphanumeric    Char))                    ;;; Character
     (testing "string"               (t gen/string               String))
     (testing "string-ascii"         (t gen/string-ascii         String))
     (testing "string-alphanumeric"  (t gen/string-alphanumeric  String))
@@ -412,7 +412,7 @@
 ;; ---------------------------------------------------------------------------
 
 (deftest elements-with-empty
-  (is (thrown? AssertionError (gen/elements ()))))
+  (is (thrown? Exception (gen/elements ()))))              ;;; AssertionError 
 
 (defspec elements-with-a-set 100
   (prop/for-all [num (gen/elements #{9 10 11 12})]
@@ -450,13 +450,13 @@
                        (< x low) [x high]
                        (> x high) [low x]
                        :else margins))
-                    [Long/MAX_VALUE Long/MIN_VALUE]
+                    [Int64/MaxValue Int64/MinValue]                                                  ;;; Long/MAX_VALUE Long/MIN_VALUE
                     ; choose uses rand-range directly, reasonable proxy for its
                     ; guarantees
-                    (take 1e6 (gen/sample-seq (gen/choose Long/MIN_VALUE Long/MAX_VALUE))))]
+                    (take 1e6 (gen/sample-seq (gen/choose Int64/MinValue Int64/MaxValue))))]         ;;; Long/MIN_VALUE Long/MAX_VALUE
     (is (< low high))
-    (is (< low Integer/MIN_VALUE))
-    (is (> high Integer/MAX_VALUE))))
+    (is (< low Int32/MinValue))                                                                      ;;; Integer/MIN_VALUE
+    (is (> high Int32/MaxValue))))                                                                   ;;; Integer/MAX_VALUE
 
 ;; rand-range yields values inclusive of both lower & upper bounds provided to it
 ;; further, that generators that use rand-range use its full range of values
