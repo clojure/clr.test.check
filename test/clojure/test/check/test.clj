@@ -171,7 +171,7 @@
     (is (:result
           (tc/quick-check 1000 (prop/for-all*
                                 [gen/keyword] keyword-string-roundtrip-equiv)
-+                          :max-size 25)))))
+                          :max-size 25)))))
 
 ;; Boolean and/or
 ;; ---------------------------------------------------------------------------
