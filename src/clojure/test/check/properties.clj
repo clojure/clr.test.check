@@ -13,7 +13,9 @@
 (defn- apply-gen
   [function]
   (fn [args]
-    (let [result (try (apply function args) (catch Exception t t))]            ;;; Throwable
+    (let [result (try (apply function args) 
+                   ;;;(catch java.lang.ThreadDeath t (throw t)) -- not nececssary in CLR.  ThreadAbortException automatically rethrown
+                   (catch Exception t t))]              ;;; Throwable
       {:result result
        :function function
        :args args})))
