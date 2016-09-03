@@ -171,10 +171,13 @@
 (defn- rand-range
   [rnd lower upper]
   {:pre [(<= lower upper)]}
-  (let [factor (/ (Math/Abs ^long (random/rand-long rnd))        ;;; Math/abs
-                  (double Int64/MaxValue))]                      ;;; Long/MAX_VALUE
-    (long (Math/Floor (+ lower (- (* factor (+ 1.0 upper))       ;;; Math/floor
-                                  (* factor lower)))))))
+  (let [factor (random/rand-double rnd)
+        ;; Use -' to maintain accuracy with overflow protection.
+        width (-' upper lower -1)]
+    (if (< width Int64/MaxValue)                                                 ;;; Long/MAX_VALUE
+      (+ lower (long (Math/Floor ^double (* factor width))))                     ;;; Math/floor , added type hint
+      ;; Clamp down to upper because double math.
+      (min upper (long (Math/Floor ^double (+ lower (* factor width))))))))      ;;; Math/floor , added type hint
 
 (defn sized
   "Create a generator that depends on the size parameter.
