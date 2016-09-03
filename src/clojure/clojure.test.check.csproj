@@ -39,7 +39,10 @@
     <EmbeddedResource Include="test\check\generators.clj" />
     <EmbeddedResource Include="test\check\properties.clj" />
     <EmbeddedResource Include="test\check\rose_tree.clj" />
-	</ItemGroup> 
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="test\check\random.clj" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

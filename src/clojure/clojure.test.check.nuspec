@@ -10,7 +10,7 @@
     <projectUrl>https://github.com/clojure/clr.test.check</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Port of test.check to ClojureCLR, version 0.7.0</releaseNotes>
+    <releaseNotes>Port of test.check to ClojureCLR, version 0.8.0</releaseNotes>
     <copyright>Copyright David Miller 2014</copyright>
     <tags>Clojure ClojureCLR</tags>
   </metadata>
