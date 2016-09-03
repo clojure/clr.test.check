@@ -404,6 +404,18 @@
                           (valid? (:right tree)))))]
     (prop/for-all [t btree] (valid? t))))
 
+(deftest calc-long-increasing
+  ;; access internal gen/calc-long function for testing
+  (are [low high] (apply < (map #(@#'gen/calc-long % low high) (range 0.0 0.9999 0.111)))
+      ;; low and high should not be too close, 100 is a reasonable spread
+      (- Int64/MaxValue 100) Int64/MaxValue                                   ;;; Long/MAX_VALUE Long/MAX_VALUE
+      Int64/MinValue (+ Int64/MinValue 100)                                   ;;; Long/MIN_VALUE Long/MIN_VALUE
+      Int64/MinValue 0                                                        ;;; Long/MIN_VALUE
+      0 100
+      -100 0
+      0 Int64/MaxValue                                                        ;;; Long/MAX_VALUE
+      Int64/MinValue Int64/MaxValue))                                         ;;; Long/MIN_VALUE Long/MAX_VALUE  
+
 ;; edn rountrips
 ;; ---------------------------------------------------------------------------
 
@@ -585,3 +597,24 @@
 (defspec run-float-time 1e3
   (prop/for-all [a gen/int]
                 (integer? a)))
+				
+;; TCHECK-77 Regression
+;; ---------------------------------------------------------------------------
+
+(deftest choose-distribution-sanity-check
+  (testing
+      "Should not get the same random value more than 90% of the time"
+    ;; This is a probabilistic test; the odds of a false-positive
+    ;; failure for the ranges with two elements should be roughly 1 in
+    ;; 10^162 (and even rarer for larger ranges), so it will never
+    ;; ever happen.
+    (are [low high] (let [xs (gen/sample (gen/choose low high) 1000)
+                          count-of-most-frequent (apply max (vals (frequencies xs)))]
+                      (< count-of-most-frequent 900))
+      (dec Int64/MaxValue) Int64/MaxValue                                    ;;; Long/MAX_VALUE  Long/MAX_VALUE
+      Int64/MinValue (inc Int64/MinValue)                                    ;;; Long/MIN_VALUE  Long/MIN_VALUE
+      Int64/MinValue 0                                                       ;;; Long/MIN_VALUE
+      0 1
+      -1 0
+      0 Int64/MaxValue                                                       ;;; Long/MAX_VALUE
+      Int64/MinValue Int64/MaxValue)))				                         ;;; Long/MIN_VALUE  Long/MAX_VALUE
