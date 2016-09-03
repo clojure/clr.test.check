@@ -19,6 +19,12 @@
 
   Note: to maintain independence you should not call more than one
   function in the IRandom protocol with the same argument")
+ (rand-double [rng]
+    "Returns a random double between zero (inclusive) and 1.0 (exclusive) 
+  based on the given immutable RNG.
+
+  Note: to maintain independence you should not call split and rand-double
+  with the same argument")
   (split [rng]
     "Returns two new RNGs [rng1 rng2], which should generate
   sufficiently independent random data.
@@ -30,14 +36,7 @@
   sufficiently independent random data.
 
   Note: to maintain independence you should not call more than one
-  function in the IRandom protocol with the same argument")
-    
-  (rand-double [rng]
-    "Returns a random double between zero (inclusive) and 1.0 (exclusive) 
-  based on the given immutable RNG.
-
-  Note: to maintain independence you should not call split and rand-double
-  with the same argument"))
+  function in the IRandom protocol with the same argument"))
 
 
 ;; Immutable version of Java 8's java.util.SplittableRandom
