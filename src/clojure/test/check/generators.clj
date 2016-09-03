@@ -185,9 +185,9 @@
         ;; Use -' to maintain accuracy with overflow protection.
         width (-' upper lower -1)]
     (if (< width Int64/MaxValue)                                                 ;;; Long/MAX_VALUE
-      (+ lower (long (Math/Floor ^double (* factor width))))                     ;;; Math/floor , added type hint
+      (long (+ lower (Math/Floor ^double (* factor width))))                             ;;; Math/floor , added type hint
       ;; Clamp down to upper because double math.
-      (min upper (long (Math/Floor ^double (+ lower (* factor width))))))))      ;;; Math/floor , added type hint
+      (long (min upper (Math/Floor ^double (+ lower (* factor width))))))))              ;;; Math/floor , added type hint
 
 (defn sized
   "Create a generator that depends on the size parameter.
