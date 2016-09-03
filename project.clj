@@ -1,4 +1,4 @@
-(defproject org.clojure.clr/test.check "0.8.2"
+(defproject org.clojure.clr/test.check "0.9.0-SNAPSHOT"
   :description "Port of github.com/clojure/test.check to ClojureCLR"
   :url "https://github.com/clojure/clr.test.check"
   :license {:name "Eclipse Public License"
