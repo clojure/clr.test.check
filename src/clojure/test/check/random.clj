@@ -192,8 +192,66 @@
   [^long seed]
   (JavaUtilSplittableRandom. golden-gamma seed))
 
+;; some global state to make sure that seedless calls to make-random
+;; return independent results
+
+;;; DM: Added
+;;; Unfortunately, this solution requires ThreadLocal values.
+;;; We do not have an internal way to create static fields in a gen-class so that we could use ThreadStatic.
+;;; And ThreadStatic in CLR was only introduced in 4.0.
+;;; So, we use the equivalent of the old way in 3.5 and use the new way in 4.0 only.
+
+;;; This duplicates compile-if from clojure/core/reducers.
+
+(defmacro ^:private compile-if
+  "Evaluate `exp` and if it returns logical true and doesn't error, expand to
+  `then`.  Else expand to `else`.
+
+  (compile-if (Class/forName \"java.util.concurrent.ForkJoinTask\")
+    (do-cool-stuff-with-fork-join)
+    (fall-back-to-executor-services))"
+  [exp then else]
+  (if (try (eval exp)
+           (catch Exception _ false))                      ;;; Throwable
+    `(do ~then)
+    `(do ~else)))
+	
+	
+;;;(def ^:private next-rng
+;;;  "Returns a random-number generator. Successive calls should return
+;;;  independent results."
+;;;  (let [a (atom (make-java-util-splittable-random (Environment/TickCount)))                    ;;; (System/currentTimeMillis)
+;;;
+;;;        thread-local
+;;;        (proxy [ThreadLocal] []
+;;;          (initialValue []
+;;;            (first (split (swap! a #(second (split %)))))))]
+;;;    (fn []
+;;;      (let [rng (.get thread-local)
+;;;            [rng1 rng2] (split rng)]
+;;;        (.set thread-local rng2)
+;;;        rng1))))
+  
+(compile-if 
+  (Type/GetType "System.Threading.ThreadLocal`1")
+  (do 		
+	(def ^:private next-rng
+	  "Returns a random-number generator. Successive calls should return
+	  independent results."
+	  (let [a (atom (make-java-util-splittable-random (Environment/TickCount)))			   
+			init-delegate (sys-func [Object] [] (first (split (swap! a #(second (split %))))))
+			thread-local (|System.Threading.ThreadLocal`1[System.Object]|. ^|System.Func`1[System.Object]| init-delegate)]
+		(fn []
+		  (let [rng (.Value thread-local)
+				[rng1 rng2] (split rng)]
+			(.set_Value thread-local rng2)
+			rng1)))))
+  (do 
+    (def ^:private next-rng 
+		(fn [] (make-java-util-splittable-random (Environment/TickCount))))))  
+  
 (defn make-random
   "Given an optional Long seed, returns an object that satisfies the
   IRandom protocol."
-  ([] (make-random (Environment/TickCount)))                                 ;;; System/currentTimeMillis
+  ([] (next-rng))
   ([seed] (make-java-util-splittable-random seed)))
