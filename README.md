@@ -14,7 +14,7 @@ Nuget reference:
 
 Leiningen/Clojars reference:
 
-   [org.clojure.clr/test.check "0.8.1"]
+   [org.clojure.clr/test.check "0.8.2"]
 
    
 ## Notes on the ported code
