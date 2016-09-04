@@ -8,14 +8,17 @@
 ;   You must not remove this notice, or any other, from this software.
 
 (ns clojure.test.check.test
-  (:use clojure.test)
-  (:require [clojure.test.check       :as tc]
+  #?(:clj (:use clojure.test)  :cljr (:use clojure.test))                                                 ;;; Added :cljr clause
+  (:require #?(:cljs
+                [cljs.test :as test :refer-macros [deftest testing is]])
+            [clojure.test.check :as tc]
             [clojure.test.check.generators :as gen]
-            [clojure.test.check.properties :as prop]
+            [clojure.test.check.properties :as prop #?@(:cljs [:include-macros true])]
             [clojure.test.check.rose-tree :as rose]
             [clojure.test.check.random :as random]
-            [clojure.test.check.clojure-test :as ct :refer (defspec)]
-            [clojure.edn :as edn]))
+            [clojure.test.check.clojure-test :as ct #?(:default :refer :cljs :refer-macros) (defspec)]    ;;; Changed :clj to :default
+            #?(:default  [clojure.edn :as edn]                                                            ;;; Changed :clj to :default
+               :cljs [cljs.reader :as edn])))
 
 (deftest generators-are-generators
   (testing "generator? returns true when called with a generator"
@@ -43,10 +46,14 @@
            (is (let [p (prop/for-all* [gen/int gen/int gen/int] passes-monoid-properties)]
                  (:result
                    (tc/quick-check 1000 p)))))
-  (testing "with ratios as well"
+  #?(:cljr                                                                                                 ;;; changed :clj to :cljr
+    (testing "with ratios as well"
            (is (let [p (prop/for-all* [gen/ratio gen/ratio gen/ratio] passes-monoid-properties)]
                  (:result
-                   (tc/quick-check 1000 p))))))
+                   (tc/quick-check 1000 p)))))
+
+    ;; NOTE: no ratios in ClojureScript - David
+    ))
 
 ;; reverse
 ;; ---------------------------------------------------------------------------
@@ -88,7 +95,7 @@
 ;; exceptions shrink and return as result
 ;; ---------------------------------------------------------------------------
 
-(def exception (Exception. "I get caught"))
+(def exception (#?(:default Exception. :cljs js/Error.) "I get caught"))                  ;;; Changed :clj to :default
 
 (defn exception-thrower
   [& args]
@@ -159,20 +166,24 @@
 ;; keyword->string->keyword roundtrip
 ;; ---------------------------------------------------------------------------
 
-(def keyword->string->keyword (comp keyword clojure.string/join rest str))
+(def keyword->string->keyword
+  (comp keyword name))
 
 (defn keyword-string-roundtrip-equiv
   [k]
   (= k (keyword->string->keyword k)))
 
+;; NOTE cljs: this is one of the slowest due to how keywords are constructed
+;; drop N to 100 - David
 (deftest keyword-string-roundtrip
   (testing
     "For all keywords, turning them into a string and back is equivalent
     to the original string (save for the `:` bit)"
     (is (:result
-          (tc/quick-check 1000 (prop/for-all*
+          (let [n #?(:default 1000 :cljs 100)]                                    ;;; Change :clj to :default
+            (tc/quick-check n (prop/for-all*
                                 [gen/keyword] keyword-string-roundtrip-equiv)
-                          :max-size 25)))))
+                            :max-size 25))))))
 
 ;; Boolean and/or
 ;; ---------------------------------------------------------------------------
@@ -256,16 +267,21 @@
   (let [t (fn [generator pred]
             (is (:result (tc/quick-check 100
                            (prop/for-all [x generator]
-                             (pred x))))))]
+                             (pred x))))))
+        is-char-fn #?(:default char? :cljs string?)]                                     ;;; Changed :clj to :default
 
     (testing "keyword"              (t gen/keyword keyword?))
+	
+    ;; No ratio in cljs
+    #?@(:cljr [                                                                          ;;; Changed :clj to :cljr
     (testing "ratio"                (t gen/ratio   (some-fn ratio? integer?)))
     (testing "byte"                 (t gen/byte    #(instance? Byte %)))
-    (testing "bytes"                (t gen/bytes   #(instance? |System.Byte[]| %)))  ;;; (Class/forName "[B")
+    (testing "bytes"                (t gen/bytes   #(instance? |System.Byte[]| %)))])    ;;; (Class/forName "[B")
 
-    (testing "char"                 (t gen/char                 char?))
-    (testing "char-ascii"           (t gen/char-ascii           char?))
-    (testing "char-alphanumeric"    (t gen/char-alphanumeric    char?))
+	
+    (testing "char"                 (t gen/char                 is-char-fn))
+    (testing "char-ascii"           (t gen/char-ascii           is-char-fn))
+    (testing "char-alphanumeric"    (t gen/char-alphanumeric    is-char-fn))
     (testing "string"               (t gen/string               string?))
     (testing "string-ascii"         (t gen/string-ascii         string?))
     (testing "string-alphanumeric"  (t gen/string-alphanumeric  string?))
@@ -404,6 +420,9 @@
                           (valid? (:right tree)))))]
     (prop/for-all [t btree] (valid? t))))
 
+;; NOTE cljs: adjust for JS numerics - NB
+
+#?(:cljr                                                                                      ;;; Change :clj to :cljr
 (deftest calc-long-increasing
   ;; access internal gen/calc-long function for testing
   (are [low high] (apply < (map #(@#'gen/calc-long % low high) (range 0.0 0.9999 0.111)))
@@ -414,7 +433,7 @@
       0 100
       -100 0
       0 Int64/MaxValue                                                        ;;; Long/MAX_VALUE
-      Int64/MinValue Int64/MaxValue))                                         ;;; Long/MIN_VALUE Long/MAX_VALUE  
+      Int64/MinValue Int64/MaxValue)))                                         ;;; Long/MIN_VALUE Long/MAX_VALUE  
 
 ;; edn rountrips
 ;; ---------------------------------------------------------------------------
@@ -455,7 +474,8 @@
 ;; ---------------------------------------------------------------------------
 
 (deftest elements-with-empty
-  (is (thrown? Exception (gen/elements ()))))              ;;; AssertionError 
+  (is (thrown? #?(:clj AssertionError :cljs js/Error  :cljr Exception)                ;;; Added :cljr clause
+               (gen/elements ()))))
 
 (defspec elements-with-a-set 100
   (prop/for-all [num (gen/elements #{9 10 11 12})]
@@ -486,6 +506,9 @@
 ;; rand-range copes with full range of longs as bounds
 ;; ---------------------------------------------------------------------------
 
+;; NOTE cljs: need to adjust for JS numerics - David
+
+#?(:cljr                                                                                            ;;; Changed :clj to :cljr
 (deftest rand-range-copes-with-full-range-of-longs
   (let [[low high] (reduce
                     (fn [[low high :as margins] x]
@@ -499,7 +522,7 @@
                     (take 1e6 (gen/sample-seq (gen/choose Int64/MinValue Int64/MaxValue))))]         ;;; Long/MIN_VALUE Long/MAX_VALUE
     (is (< low high))
     (is (< low Int32/MinValue))                                                                      ;;; Integer/MIN_VALUE
-    (is (> high Int32/MaxValue))))                                                                   ;;; Integer/MAX_VALUE
+    (is (> high Int32/MaxValue)))))                                                                  ;;; Integer/MAX_VALUE
 
 ;; rand-range yields values inclusive of both lower & upper bounds provided to it
 ;; further, that generators that use rand-range use its full range of values
@@ -601,6 +624,8 @@
 ;; TCHECK-77 Regression
 ;; ---------------------------------------------------------------------------
 
+;; Note cljs: need to adjust for JS numerics - NB
+#?(:cljr                                                                       ;;; changed :clj to :cljr
 (deftest choose-distribution-sanity-check
   (testing
       "Should not get the same random value more than 90% of the time"
@@ -617,4 +642,4 @@
       0 1
       -1 0
       0 Int64/MaxValue                                                       ;;; Long/MAX_VALUE
-      Int64/MinValue Int64/MaxValue)))				                         ;;; Long/MIN_VALUE  Long/MAX_VALUE
+      Int64/MinValue Int64/MaxValue)))) 			                         ;;; Long/MIN_VALUE  Long/MAX_VALUE
