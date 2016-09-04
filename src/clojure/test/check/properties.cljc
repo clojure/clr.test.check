@@ -14,8 +14,8 @@
   [function]
   (fn [args]
     (let [result (try (apply function args) 
-                   ;;;(catch java.lang.ThreadDeath t (throw t)) -- not nececssary in CLR.  ThreadAbortException automatically rethrown
-                   (catch Exception t t))]              ;;; Throwable
+                   #?(:clj (catch java.lang.ThreadDeath t (throw t)))
+                   (catch #?(:clj Throwable :cljs :default  :cljr Exception) t t))]	    ;;; Added :cljr clause
       {:result result
        :function function
        :args args})))
