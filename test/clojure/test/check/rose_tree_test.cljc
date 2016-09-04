@@ -8,12 +8,11 @@
 ;   You must not remove this notice, or any other, from this software.
 
 (ns clojure.test.check.rose-tree-test
-  (:use clojure.test)
-  (:require [clojure.test.check       :as tc]
-            [clojure.test.check.generators :as gen]
-            [clojure.test.check.properties :as prop]
+  (:require [clojure.test.check.generators :as gen]
+            [clojure.test.check.properties :as prop #?@(:cljs [:include-macros true])]
             [clojure.test.check.rose-tree :as rose]
-            [clojure.test.check.clojure-test :as ct :refer (defspec)]))
+            [clojure.test.check.clojure-test :as ct
+             #?(:default :refer :cljs :refer-macros) (defspec)]))                          ;;; change :clj to :default
 
 (defn depth-one-children
   [[root children]]
