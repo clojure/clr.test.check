@@ -695,6 +695,20 @@
   (prop/for-all [[coll permutation] original-vector-and-permutation]
     (= (sort coll) (sort permutation))))
 
+;; UUIDs
+;; ---------------------------------------------------------------------------
+
+(defspec uuid-generates-uuids
+  (prop/for-all [uuid gen/uuid]
+    (and (instance? #?(:clj java.util.UUID :cljs cljs.core.UUID :cljr System.Guid) uuid)                  ;;; Added :cljr clause
+         ;; check that we got the special fields right
+         #_(re-matches #"[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"             ;;; Commented out this clause-  System.Guid does not have the encoding restriction.
+                     (str uuid)))))
+
+(deftest uuid-generates-distinct-values
+  (is (apply distinct?
+             (gen/sample gen/uuid 1000))))
+
 ;; vector can generate large vectors; regression for TCHECK-49
 ;; ---------------------------------------------------------------------------
 
