@@ -11,9 +11,11 @@
   (:refer-clojure :exclude [int vector list hash-map map keyword
                             char boolean byte bytes sequence
                             shuffle not-empty symbol namespace])
-  (:require [clojure.core :as core]      clojure.string                     ;;; added clojure.string
+  (:require [#?(:default clojure.core :cljs cljs.core) :as core]   #?(:cljr clojure.string)         ;;; Change :clj to :default, Add clojure.string
             [clojure.test.check.random :as random]
-            [clojure.test.check.rose-tree :as rose]))
+            [clojure.test.check.rose-tree :as rose]
+            #?@(:cljs [[goog.string :as gstring]
+                       [clojure.string]])))
 
 
 ;; Gen
@@ -187,14 +189,19 @@
             (integer? lower) (integer? upper) (<= lower upper)]
       :post [(integer? %)]}
   ;; Use -' on width to maintain accuracy with overflow protection.
-  (let [width (-' upper lower -1)]
-    ;; Preserve long precision if the width is in the long range.  Otherwise, we must accept
-    ;; less precision because doubles don't have enough bits to preserve long equivalence at
-    ;; extreme values.
-    (if (< width Int64/MaxValue)                                                   ;;; Long/MAX_VALUE
-      (+ lower (long (Math/Floor ^double (* factor width))))                       ;;; Math/floor, added type hint
-      ;; Clamp down to upper because double math.
-      (min upper (long (Math/Floor ^double (+ lower (* factor width))))))))        ;;; Math/floor, added type hint
+  #?(:default                                                                                   ;;; Changed :clj to :default - but really should add code to differentiate on Long vs Int64 also
+     (let [width (-' upper lower -1)]
+       ;; Preserve long precision if the width is in the long range.  Otherwise, we must accept
+       ;; less precision because doubles don't have enough bits to preserve long equivalence at
+       ;; extreme values.
+       (if (< width Int64/MaxValue)                                                   ;;; Long/MAX_VALUE
+         (+ lower (long (Math/Floor ^double (* factor width))))                       ;;; Math/floor, added type hint
+         ;; Clamp down to upper because double math.
+         (min upper (long (Math/Floor ^double (+ lower (* factor width)))))))        ;;; Math/floor, added type hint
+
+     :cljs
+     (long (Math/floor (+ lower (- (* factor (+ 1.0 upper))
+                                    (* factor lower)))))))  
   
 (defn- rand-range
   [rnd lower upper]
@@ -231,12 +238,21 @@
     (sized (fn [n] (resize (f n) generator)))))
 
 (defn choose
-  "Create a generator that returns long integers in the range `lower` to `upper`, inclusive."
+  #?(:default                                                                                         ;;; changed :clj to :default
+     "Create a generator that returns long integers in the range `lower` to `upper`, inclusive."
+
+     :cljs
+     "Create a generator that returns numbers in the range
+     `lower` to `upper`, inclusive.")
   [lower upper]
   ;; cast to long to support doubles as arguments per TCHECK-73
-  (let [lower (long lower)
-        upper (long upper)]
-    (make-gen
+  (let #?(:default                                                                                   ;;; changed :clj to :default
+          [lower (long lower)
+           upper (long upper)]
+
+          :cljs ;; does nothing, no long in cljs
+          [])
+  (make-gen
      (fn [rnd _size]
        (let [value (rand-range rnd lower upper)]
          (rose/filter
@@ -349,9 +365,8 @@
   [gen]
   (assert (generator? gen) "Arg to no-shrink must be a generator")
   (gen-bind gen
-            (fn [[root _children]]
-              (gen-pure
-                [root []]))))
+            (fn [rose]
+              (gen-pure (rose/make-rose (rose/root rose) [])))))
 
 (defn shrink-2
   "Create a new generator like `gen`, but will consider nodes for shrinking
@@ -478,13 +493,17 @@
           ;; nice, relatively quick shrinks.
           (vector (tuple index-gen index-gen) 0 (* 2 (count coll))))))
 
-(def byte
-  "Generates `java.lang.Byte`s, using the full byte-range."
-  (fmap core/byte (choose Byte/MinValue Byte/MaxValue)))                ;;; Byte/MIN_VALUE Byte/MAX_VALUE
+;; NOTE cljs: Comment out for now - David
 
-(def bytes
-  "Generates byte-arrays."
-  (fmap core/byte-array (vector byte)))
+#?(:cljr                                                                      ;;; Changed :clj to :cljr, but should do the right thing, the Min/MaxValue thing
+    (def byte
+      "Generates `java.lang.Byte`s, using the full byte-range."
+     (fmap core/byte (choose Byte/MinValue Byte/MaxValue))))                ;;; Byte/MIN_VALUE Byte/MAX_VALUE
+
+#?(:cljr                                                                        ;;; Changed :clj to :cljr,
+    (def bytes
+      "Generates byte-arrays."
+      (fmap core/byte-array (vector byte))))
 
 (defn map
   "Create a generator that generates maps, with keys chosen from
@@ -572,16 +591,21 @@
   Generate alphanumeric strings."
   string-alphanumeric)
 
+(defn- digit?
+  [d]
+  #?(:clj  (Character/isDigit ^Character d)  :cljr  (Char/IsDigit ^Char d)        ;;; Added :cljr clause
+     :cljs (gstring/isNumeric d)))
+
 (defn- +-or---digit?
   "Returns true if c is \\+ or \\- and d is non-nil and a digit.
 
   Symbols that start with +3 or -2 are not readable because they look
   like numbers."
-  [c  d]                                          ;;; ^Character  -- not sure how this got in
+  [c  d]
   (core/boolean (and d
-                     (or (= \+ c)
-                         (= \- c))
-                     (Char/IsDigit ^Char d))))          ;;; Character/isDigit
+                     (or (#?(:default = :cljs identical?) \+ c)                  ;;; Changed :clj to :default
+                         (#?(:default = :cljs identical?) \- c))                 ;;; Changed :clj to :default
+                     (digit? d))))
 
 (def ^{:private true} namespace-segment
   "Generate the segment of a namespace."
