@@ -565,12 +565,19 @@
 ;; edn rountrips
 ;; ---------------------------------------------------------------------------
 
+(def simple-type
+  "Like gen/simple-type but excludes Infinity and NaN."
+  (gen/one-of [gen/int #_(gen/double* {:infinite? false, :NaN? false}) gen/char gen/string                  ;;; commented out double* because we cannot get exact round-trip on X64/.Net,  see http://stackoverflow.com/questions/24299692/why-is-a-round-trip-conversion-via-a-string-not-safe-for-a-double
+               gen/ratio gen/boolean gen/keyword gen/keyword-ns gen/symbol gen/symbol-ns gen/uuid]))
+
+(def any-edn (gen/recursive-gen gen/container-type simple-type))
+
 (defn edn-roundtrip?
   [value]
   (= value (-> value prn-str edn/read-string)))
 
 (defspec edn-roundtrips 50
-  (prop/for-all [a gen/any]
+  (prop/for-all [a any-edn]
                 (edn-roundtrip? a)))
 
 ;; not-empty works
@@ -708,6 +715,66 @@
 (deftest uuid-generates-distinct-values
   (is (apply distinct?
              (gen/sample gen/uuid 1000))))
+
+;; fancy numbers
+;; ---------------------------------------------------------------------------
+
+(defn infinite?
+  [x]
+  #?(:clj (Double/isInfinite x)    :cljr (Double/IsInfinity x)                    ;;; Added :cljr clause
+     :cljs (or (= @#'gen/POS_INFINITY x)
+               (= @#'gen/NEG_INFINITY x))))
+
+(defn nan?
+  [x]
+  #?(:clj (Double/isNaN x)  :cljr (Double/IsNaN x)                               ;;; Added :cljr clause
+     :cljs (.isNaN js/Number x)))
+
+(defspec double-test 100
+  (prop/for-all [x gen/double]
+    #?(:default (instance? Double x)                                             ;;; Changed :clj to :default
+       :cljs (number? x))))
+
+(defspec double-distribution-test 5
+  (prop/for-all [xs (gen/no-shrink
+                     (gen/vector (gen/resize 100 gen/double) 10000))]
+    (and (some #(= @#'gen/POS_INFINITY %) xs)
+         (some #(= @#'gen/NEG_INFINITY %) xs)
+         (some nan? xs)
+         (every? (fn [[lb ub]]
+                   (some #(<= lb % ub) xs))
+                 [[-1e303 -1e200]
+                  [-1e200 -1e100]
+                  [-1e100 -1.0]
+                  [0.0 0.0]
+                  [1.0 1e100]
+                  [1e100 1e200]
+                  [1e200 1e303]])
+         #_(let [mods (->> xs                        ;;; mod blows in Numbers.remainder when number out of range of Int64.  See CLJCLR-83.
+                         (remove infinite?)
+                         (remove nan?)
+                         (map #(mod % 1.0)))]
+           (every? (fn [[lb ub]]
+                     (some #(<= lb % ub) mods))
+                   [[0.0 0.1]
+                    [0.1 0.2]
+                    [0.25 0.75]
+                    [0.8 0.9]
+                    [0.9 1.0]])))))
+
+(defspec double-range-test 100
+  (prop/for-all [[[lb ub] x]
+                 (gen/bind (gen/vector (gen/double* {:infinite? false
+                                                     :NaN? false})
+                                       2)
+                           (fn [bounds]
+                             (let [bounds (sort bounds)]
+                               (gen/fmap #(vector bounds %)
+                                         (gen/double* {:infinite? false
+                                                       :NaN? false
+                                                       :min (first bounds)
+                                                       :max (second bounds)})))))]
+    (<= lb x ub)))
 
 ;; vector can generate large vectors; regression for TCHECK-49
 ;; ---------------------------------------------------------------------------
