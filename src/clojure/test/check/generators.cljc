@@ -1326,7 +1326,9 @@
   [inner-type]
   (one-of [(vector inner-type)
            (list inner-type)
-           (map inner-type inner-type)]))
+           ;; scaling this by half since it naturally generates twice
+           ;; as many elements
+           (scale #(quot % 2) (map inner-type inner-type))]))
 
 ;; A few helpers for recursive-gen
 
@@ -1336,7 +1338,10 @@
   ;; optimize the number of leaf nodes that recursive-gen generates
   ;; so that it is as high as possible while still having a very
   ;; high probability of being <= `size`.
-  (long (Math/Pow size 1.3038)))                                       ;;; Math/pow
+  ;; chosen so that recursive-gen (with the assumptions mentioned in
+  ;; the comment below) will generate structures with leaf-node-counts
+  ;; not greater than the `size` ~99% of the time.
+  (long (Math/Pow size 1.1)))                                          ;;; Math/pow
 
 (core/let [log2 (Math/Log 2)]                                          ;;; Math/log
   (defn ^:private random-pseudofactoring

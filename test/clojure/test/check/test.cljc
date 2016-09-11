@@ -955,4 +955,13 @@
           res (tc/quick-check 100 prop :seed 42)
           test-runs-during-shrinking (- @state)]
       (is (= test-runs-during-shrinking
-             (get-in res [:shrunk :total-nodes-visited]))))))	  
+             (get-in res [:shrunk :total-nodes-visited]))))))
+
+;; TCHECK-32 Regression
+;; ---------------------------------------------------------------------------
+
+;; This gives a stack error in CLJS, don't know why
+#?(:clj                                                             ;;; Takes extraordinarily long in :cljr also, so didn't include.
+   (defspec merge-is-idempotent-and-this-spec-doesn't-OOM 200
+     (prop/for-all [m (gen/map gen/any gen/any)]
+       (= m (merge m m)))))
