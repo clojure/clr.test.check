@@ -1220,11 +1220,19 @@
   (->> (tuple char-keyword-first (vector char-keyword-rest))
        (fmap (fn [[c cs]] (clojure.string/join (cons c cs))))))
 
+(defn ^:private resize-symbolish-generator
+  "Scales the sizing down on a keyword or symbol generator so as to
+  make it reasonable."
+  [g]
+  ;; function chosen by ad-hoc experimentation
+  (scale #(long (Math/Pow % 0.46)) g))                                         ;;; Math/pow
+
 (def keyword
   "Generate keywords without namespaces."
   (->> (tuple keyword-segment-first (vector keyword-segment-rest))
        (fmap (fn [[c cs]]
-               (core/keyword (clojure.string/join ":" (cons c cs)))))))
+               (core/keyword (clojure.string/join ":" (cons c cs)))))
+       (resize-symbolish-generator)))
 
 (def
   ^{:added "0.5.9"}
@@ -1232,7 +1240,8 @@
   "Generate keywords with optional namespaces."
   (->> (tuple namespace char-keyword-first (vector char-keyword-rest))
        (fmap (fn [[ns c cs]]
-               (core/keyword ns (clojure.string/join (cons c cs)))))))
+               (core/keyword ns (clojure.string/join (cons c cs)))))
+       (resize-symbolish-generator)))
 
 (def ^{:private true} char-symbol-first
   (frequency [[10 char-alpha]
@@ -1248,7 +1257,8 @@
   "Generate symbols without namespaces."
   (frequency [[100 (->> (tuple char-symbol-first (vector char-symbol-rest))
                         (such-that (fn [[c [d]]] (not (+-or---digit? c d))))
-                        (fmap (fn [[c cs]] (core/symbol (clojure.string/join (cons c cs))))))]
+                        (fmap (fn [[c cs]] (core/symbol (clojure.string/join (cons c cs)))))
+                        (resize-symbolish-generator))]
               [1 (return '/)]]))
 
 (def
@@ -1257,7 +1267,8 @@
   "Generate symbols with optional namespaces."
   (frequency [[100 (->> (tuple namespace char-symbol-first (vector char-symbol-rest))
                         (such-that (fn [[_ c [d]]] (not (+-or---digit? c d))))
-                        (fmap (fn [[ns c cs]] (core/symbol ns (clojure.string/join (cons c cs))))))]
+                        (fmap (fn [[ns c cs]] (core/symbol ns (clojure.string/join (cons c cs)))))
+                        (resize-symbolish-generator))]
               [1 (return '/)]]))
 
 (def ratio
