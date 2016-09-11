@@ -1330,6 +1330,7 @@
   [inner-type]
   (one-of [(vector inner-type)
            (list inner-type)
+		   (set inner-type)
            ;; scaling this by half since it naturally generates twice
            ;; as many elements
            (scale #(quot % 2) (map inner-type inner-type))]))
