@@ -8,10 +8,11 @@
 ;   You must not remove this notice, or any other, from this software.
 
 (ns clojure.test.check.clojure-test-test
-  #?(:clj (:use clojure.test) :cljr (:use clojure.test))                                                        ;;; Added :cljr clause
   (:require #?@(:cljs
                 [[cljs.test :as test :refer [test-var] :refer-macros [is]]
                  [cljs.reader :refer [read-string]]])
+            #?(:clj  [clojure.test :refer :all]                                                                ;;; Added :cljr clause
+               :cljr [clojure.test :refer :all])
             [clojure.test.check.generators :as gen]
             [clojure.test.check.properties :as prop #?@(:cljs [:include-macros true])]               
             [clojure.test.check.clojure-test :as ct #?@(:default  [:refer (defspec)]                           ;;; changed :clj to :default
