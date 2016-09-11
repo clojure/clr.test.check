@@ -34,14 +34,14 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="test\check.clj" />
-    <EmbeddedResource Include="test\check\clojure_test.clj" />
-    <EmbeddedResource Include="test\check\generators.clj" />
-    <EmbeddedResource Include="test\check\properties.clj" />
-    <EmbeddedResource Include="test\check\rose_tree.clj" />
+    <EmbeddedResource Include="test\check\random.clj" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="test\check\random.clj" />
+    <EmbeddedResource Include="test\check.cljc" />
+    <EmbeddedResource Include="test\check\clojure_test.cljc" />
+    <EmbeddedResource Include="test\check\generators.cljc" />
+    <EmbeddedResource Include="test\check\properties.cljc" />
+    <EmbeddedResource Include="test\check\rose_tree.cljc" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
