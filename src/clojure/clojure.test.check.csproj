@@ -43,6 +43,9 @@
     <EmbeddedResource Include="test\check\properties.cljc" />
     <EmbeddedResource Include="test\check\rose_tree.cljc" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="test\check\impl.cljc" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
