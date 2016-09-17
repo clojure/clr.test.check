@@ -51,9 +51,8 @@
 
 (defn- capture-test-var
   [v]
-  (doto (with-out-str #?(:default  (binding [*test-out* *out*] (test-var v))         ;;; changed :clj to :default
-                         :cljs (test-var v)))
-    println))
+  (with-out-str #?(:default  (binding [*test-out* *out*] (test-var v))         ;;; changed :clj to :default
+                   :cljs (test-var v))))
 
 (defn test-ns-hook
   []
