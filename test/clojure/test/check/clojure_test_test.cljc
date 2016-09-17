@@ -75,7 +75,7 @@
 
   (binding [ct/*report-trials* true]
     (let [output (capture-test-var #'trial-counts)]
-      (is (re-matches #?(:default  #"(?s)\.{5}.+"                               ;;; changed :clj to :default
+      (is (re-matches #?(:clj  (java.util.regex.Pattern/compile "(?s)\\.{5}.+") :cljr  #"(?s)\.{5}.+"                               ;;; Added :cljr clause
                          :cljs #"\.{5}[\s\S]+")
                       output))))
 
@@ -117,9 +117,9 @@
                [(:report-counters env) report-str])))]
     (is (== 1 (:fail report-counters)))
     (is (re-seq
-          #?(:default                                                                      ;;; changed :clj to :default
-             #"(?s)Shrinking vector-elements-are-unique starting with parameters \[\[.+"
-
+          #?(:clj                                                                     
+                         (java.util.regex.Pattern/compile "(?s)Shrinking vector-elements-are-unique starting with parameters \\[\\[.+")
+			 :cljr #"(?s)Shrinking vector-elements-are-unique starting with parameters \[\[.+"                                              ;;; Added :cljr clause
              :cljs
              #"Shrinking vector-elements-are-unique starting with parameters \[\[[\s\S]+")
          stdout)))
