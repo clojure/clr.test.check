@@ -68,10 +68,10 @@
           (= {:test-var "trial-counts", :result true, :num-tests 5000})))
 
   (binding [ct/*report-trials* true]
-     (let [output (capture-test-var #'trial-counts)]
-       (is (re-matches #?(:default  #"(?s)\.{5}.+"                               ;;; changed :clj to :default
-                          :cljs #"\.{5}[\s\S]+")
-                       output))))
+    (let [output (capture-test-var #'trial-counts)]
+      (is (re-matches #?(:default  #"(?s)\.{5}.+"                               ;;; changed :clj to :default
+                         :cljs #"\.{5}[\s\S]+")
+                      output))))
 
   (binding [ct/*report-trials* ct/trial-report-periodic
             ct/*trial-report-period* 500]
