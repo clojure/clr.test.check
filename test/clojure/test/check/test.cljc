@@ -295,6 +295,19 @@
     (testing "list"   (t (gen/list gen/int)   list?))
     (testing "map"    (t (gen/map gen/int gen/int) map?))))
 
+;; such-that
+;; --------------------------------------------------------------------------
+
+(deftest such-that-allows-customizing-exceptions
+  (is (thrown-with-msg? Exception #"Oh well!"
+                        (gen/generate
+                         (gen/such-that
+                          #(apply distinct? %)
+                          (gen/vector gen/boolean 5)
+                          {:ex-fn (fn [{:keys [pred gen max-tries]}]
+                                    (is (and pred gen max-tries))
+                                    (throw (Exception. "Oh well!")))})))))
+
 ;; Distinct collections
 ;; --------------------------------------------------------------------------
 
@@ -368,10 +381,16 @@
   (doseq [g [gen/vector-distinct
              gen/list-distinct
              gen/set
-             gen/sorted-set]]
-    (is (thrown? #?(:default Exception :cljs js/Error)                             ;;; Changed :clj to :default
-                      (first (gen/sample
-                              (g gen/boolean {:min-elements 5}))))))
+             gen/sorted-set
+             (partial gen/vector-distinct-by pr-str)
+             (partial gen/list-distinct-by pr-str)]]
+    (is (thrown-with-msg? #?(:default Exception :cljs js/Error) #"Couldn't generate enough distinct elements"       ;;; changed :clj to :default
+                          (first (gen/sample
+                                  (g gen/boolean {:min-elements 5})))))
+    (is (thrown-with-msg? #?(:default Exception :cljs js/Error) #"foo bar"                                          ;;; changed :clj to :default
+                          (first (gen/sample
+                                  (g gen/boolean {:min-elements 5
+                                                  :ex-fn (fn [arg] (ex-info "foo bar" arg))}))))))
   (is (thrown? #?(:default Exception :cljs js/Error)                               ;;; Changed :clj to :default
                (first (gen/sample
                        (gen/map gen/boolean gen/nat {:min-elements 5}))))))
@@ -428,7 +447,7 @@
                e))]
     (is (re-find #"Couldn't generate enough distinct elements"
                  #? (:clj (.getMessage ^Exception ex) :cljs (.-message ex) :cljr (.Message ^Exception ex))))          ;;; Added :cljr clause
-    (is (#{[true false] [false true]} (-> ex ex-data :so-far)))))
+    (is (= 5 (-> ex ex-data :num-elements)))))
 
 ;; Generating proper matrices
 ;; ---------------------------------------------------------------------------
