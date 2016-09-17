@@ -11,8 +11,8 @@
   (:require #?@(:cljs
                 [[cljs.test :as test :refer [test-var] :refer-macros [is]]
                  [cljs.reader :refer [read-string]]])
-            #?(:clj  [clojure.test :refer :all]                                                                ;;; Added :cljr clause
-               :cljr [clojure.test :refer :all])
+            #?(:clj  [clojure.test :as test :refer :all]                                                                ;;; Added :cljr clause
+               :cljr [clojure.test :as test :refer :all])
             [clojure.test.check.generators :as gen]
             [clojure.test.check.properties :as prop #?@(:cljs [:include-macros true])]               
             [clojure.test.check.clojure-test :as ct #?@(:default  [:refer (defspec)]                           ;;; changed :clj to :default
@@ -71,12 +71,23 @@
   #?(:cljr                                                                      ;;; changed :clj to :cljr
       (binding [ct/*report-trials* ct/trial-report-periodic
                 ct/*trial-report-period* 500]
-        (is (re-seq
-              #"(Passing trial \d{3} / 1000 for .+\n)+"
-              (capture-test-var #'long-running-spec)))))
+        (let [last-trial-report @#'ct/last-trial-report
+              trial-report-0 @last-trial-report
+              _ (test/report {:type :begin-test-var})
+              trial-report-1 @last-trial-report]
+          (is (> trial-report-1 trial-report-0)
+              "calling with {:type :begin-test-var} makes last-trial-report to increment")
+          (test/report {:type :end-test-var})
+          (is (= trial-report-1 @last-trial-report)
+              "calling with other :type keeps last-trial-report constant")
+          (is (re-seq
+                #"(Passing trial \d{3} / 1000 for .+\n)+"
+                (capture-test-var #'long-running-spec)))
+          (is (> @last-trial-report trial-report-1)
+              "running the test makes last-trial-report to increment"))))
 
   (let [[report-counters stdout]
-        #?(:cljr                                                                      ;;; changed :clj to :cljr
+        #?(:default                                                             ;;; changed :clj to :default
            (binding [ct/*report-shrinking* true
                       ; need to keep the failure of this-is-supposed-to-fail from
                       ; affecting the clojure.test.check test run
@@ -95,9 +106,9 @@
                (test/set-env! restore-env)
                [(:report-counters env) report-str])))]
 
-    (is (== 1 (:fail @report-counters)))
+    (is (== 1 (:fail report-counters)))
     (is (re-seq
-          #?(:cljr                                                                      ;;; changed :clj to :cljr
+          #?(:default                                                                      ;;; changed :clj to :default
              #"(?s)Shrinking vector-elements-are-unique starting with parameters \[\[.+"
 
              :cljs
