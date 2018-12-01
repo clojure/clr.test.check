@@ -8,7 +8,9 @@
 ;   You must not remove this notice, or any other, from this software.
 
 (ns clojure.test.check.test
-  (:require #?(:cljs
+  #?(:cljs
+     (:refer-clojure :exclude [infinite?]))
+    (:require #?(:cljs
                [cljs.test :as test :refer-macros [deftest testing is]])
             #?(:clj [clojure.test :refer :all]
                :cljr [clojure.test :refer :all])                                                          ;;; Added :cljr clause
