@@ -37,10 +37,10 @@
           (let [start (.valueOf (js/Date.))]
             ;; let's do some busy waiting for 1 msec, so we avoid setTimeout
             ;; which would make our test async
-            (while (= start
-                      (.valueOf (js/Date.)))
-              (apply + (range 50)))))
-       true)))
+                         (while (= start
+                                   (.valueOf (js/Date.)))
+                           (apply + (range 50)))))
+                    true)))
 
 (defn- vector-elements-are-unique*
   [v]
@@ -48,8 +48,8 @@
 
 (def ^:private vector-elements-are-unique
   (prop/for-all*
-    [(gen/vector gen/int)]
-    vector-elements-are-unique*))
+   [(gen/vector gen/int)]
+   vector-elements-are-unique*))
 
 (defspec this-is-supposed-to-fail 100 vector-elements-are-unique)
 
