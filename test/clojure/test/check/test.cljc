@@ -309,7 +309,7 @@
                           (gen/vector gen/boolean 5)
                           {:ex-fn (fn [{:keys [pred gen max-tries]}]
                                     (is (and pred gen max-tries))
-                                    (throw (#?(:default Exception. :cljs js/Error.) "Oh well!")))})))))          ;;; Changed :clj to :default
+                                    (#?(:default Exception. :cljs js/Error.) "Oh well!"))})))))                  ;;; Changed :clj to :default
 
 ;; Distinct collections
 ;; --------------------------------------------------------------------------
