@@ -1,7 +1,6 @@
 (ns clojure.test.check.clojure-test.assertions
   #?(:cljs (:require-macros [clojure.test.check.clojure-test.assertions.cljs]))
-  (:require [clojure.string :as str]
-            #?(:default [clojure.test :as t]             ;;; changed :clj to :default
+  (:require #?(:default [clojure.test :as t]             ;;; changed :clj to :default
                :cljs [cljs.test :as t])
             [clojure.test.check.results :as results]))
 
@@ -9,10 +8,10 @@
    (defn test-context-stacktrace [st]
      (drop-while
        #(let [class-name (.FullName (.GetType ^System.Diagnostics.StackFrame %))]                           ;;; (.getClassName ^StackTraceElement %)
-          (or (clojure.string/starts-with? class-name "java.lang")
-              (clojure.string/starts-with? class-name "clojure.test+")                                      ;;; "clojure.test$"
-              (clojure.string/starts-with? class-name "clojure.test.check.clojure_test+")                   ;;; "clojure.test.check.clojure_test$"
-              (clojure.string/starts-with? class-name "clojure.test.check.clojure_test.assertions")))
+          (or (.StartsWith class-name "System")                                           ;;; .startsWith  "java.lang"  -- I guess "System" as good as I can get
+              (.StartsWith  class-name "clojure.test+")                                      ;;; .startsWith "clojure.test$"
+              (.StartsWith  class-name "clojure.test.check.clojure_test+")                   ;;; .startsWith "clojure.test.check.clojure_test$"
+              (.StartsWith  class-name "clojure.test.check.clojure_test.assertions")))       ;;; .startsWith 
        st)))
 
 #?(:cljr                                                 ;;; changed :clj to :cljr		
