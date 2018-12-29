@@ -21,6 +21,7 @@
             [clojure.test.check.random :as random]
             [clojure.test.check.results :as results]
             [clojure.test.check.clojure-test :as ct #?(:default :refer :cljs :refer-macros) (defspec)]    ;;; Changed :clj to :default
+            #?(:cljs [clojure.test.check.random.longs :as rl])			
             #?(:default  [clojure.edn :as edn]                                                            ;;; Changed :clj to :default
                :cljs [cljs.reader :as edn])))
 
@@ -91,7 +92,7 @@
 
 (defn first-is-gone
   [l]
-  (not (some #{(first l)} (vec (rest l)))))
+  (not (some #{(first l)} (rest l))))
 
 (deftest bad-remove
   (testing "For all vectors L, if we remove the first element E, E should not
