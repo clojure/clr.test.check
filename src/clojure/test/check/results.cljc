@@ -16,7 +16,7 @@
   (result-data [result] "A map of data about the trial."))
 
 (extend-protocol Result
-  #?(:clj Object :cljs default :cljr Object)
+  #?(:clj Object :cljs default :cljr Object)  ;;; Added :cljr k/v
   (passing? [this] (boolean this))
   (result-data [this] {})
 

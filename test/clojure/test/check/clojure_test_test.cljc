@@ -182,8 +182,7 @@
     (is (= 1 (count shrunk)))
     (let [[a b & more] (-> shrunk first ::ct/params first)]
       (is (empty? more))
-      (is (and a b (= a b))))))
-		  
+      (is (and a b (= a b)))))) 
 
 (defspec this-throws-an-exception
   (prop/for-all [x gen/nat]

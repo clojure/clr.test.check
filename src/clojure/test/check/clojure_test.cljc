@@ -22,7 +22,7 @@
   (if (and (not (results/passing? result))
            (exception-like? (:clojure.test.check.properties/error result-data)))
     (throw (:clojure.test.check.properties/error result-data))
-     (ct/is (clojure.test.check.clojure-test/check? m))))
+    (ct/is (clojure.test.check.clojure-test/check? m))))
 
 (def ^:dynamic *default-test-count* 100)
 
