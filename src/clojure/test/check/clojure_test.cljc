@@ -163,6 +163,9 @@
   report shrunk results. Defaults to true."
   true)
 
+;; This check accomodates a number of tools that rebind ct/report
+;; to be a regular function instead of a multimethod, and may do
+;; so before this code is loaded (see TCHECK-125)
 (if-not (instance? #?(:default clojure.lang.MultiFn :cljs MultiFn) ct/report)                                    ;;; changed :clj to :default
   (binding [*out* *err*]
     (println "clojure.test/report is not a multimethod, some reporting functions have been disabled."))
