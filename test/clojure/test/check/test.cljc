@@ -23,7 +23,7 @@
             [clojure.test.check.clojure-test :as ct #?(:default :refer :cljs :refer-macros) (defspec)]    ;;; Changed :clj to :default
             #?(:cljs [clojure.test.check.random.longs :as rl])			
             #?(:default  [clojure.edn :as edn]                                                            ;;; Changed :clj to :default
-               :cljs [cljs.reader :as edn])))
+               :cljs [cljs.reader :as edn :refer [read-string]])))
 
 (def gen-seed
   (let [gen-int (gen/choose 0 0x100000000)]
@@ -143,7 +143,18 @@
                  (tc/quick-check 100
                                  (prop/for-all [x gen/nat]
                                    e)))))))
-								   
+;; TCHECK-134
+#?(:cljs
+   (defn multiply-check [x y]
+     (let [goog-math-long (.multiply x y)
+           test-check (rl/* x y)]
+       (and (== (.-high_ goog-math-long) (.-high_ test-check))
+            (== (.-low_ goog-math-long) (.-low_ test-check))))))
+#?(:cljs
+    (deftest multiply-test-check-and-goog
+      (testing "For goog.math.Long's test.check multiply is the same as goog.math.Long.multiply"
+        (is (:result
+              (tc/quick-check 1000 (prop/for-all* [gen/gen-raw-long gen/gen-raw-long] multiply-check)))))))								   
 ;; Count and concat work as expected
 ;; ---------------------------------------------------------------------------
 
@@ -196,23 +207,24 @@
 ;; keyword->string->keyword roundtrip
 ;; ---------------------------------------------------------------------------
 
-(def keyword->string->keyword
-  (comp keyword name))
-
-(defn keyword-string-roundtrip-equiv
-  [k]
-  (= k (keyword->string->keyword k)))
-
 ;; NOTE cljs: this is one of the slowest due to how keywords are constructed
 ;; drop N to 100 - David
-(deftest keyword-string-roundtrip
-  (testing "For all keywords, turning them into a string and back is equivalent
-           to the original string (save for the `:` bit)"
+(deftest keyword-symbol-serialization-roundtrip
+  (testing "For all keywords and symbol, (comp read-string pr-str) is identity."
     (is (:result
-         (let [n #?(:clj 1000 :cljs 100 :cljr 1000)]                               ;;; Added :cljr
-           (tc/quick-check n (prop/for-all*
-                              [gen/keyword] keyword-string-roundtrip-equiv)
-                           :max-size 25))))))
+         (tc/quick-check #?(:clj 1000 :cljs 100  :cljr 1000)                          ;;; Added :cljr
+                         (prop/for-all [x (gen/one-of [gen/keyword
+                                                       gen/keyword-ns
+                                                       gen/symbol
+                                                       gen/symbol-ns])]
+                           ;; TODO: Remove the cljs special case once
+                           ;; clojurescript has been upgraded to
+                           ;; latest version
+                           #?(:default												;;; Changed :clj to :default								
+                              (= x (read-string (pr-str x)))
+                              :cljs
+                              (or (= :/ x )
+                                  (= x (read-string (pr-str x)))))))))))
 
 ;; Boolean and/or
 ;; ---------------------------------------------------------------------------
@@ -657,7 +669,14 @@
 
 (defspec edn-roundtrips 200
   (prop/for-all [a any-edn]
-    (edn-roundtrip? a)))
+    ;; TODO: Remove the cljs special case once
+    ;; clojurescript has been upgraded to
+    ;; latest version
+    #?(:default								    ;;; changed :clj to :default											
+       (edn-roundtrip? a)
+       :cljs
+       (or (some #{:/} (tree-seq coll? seq a))
+           (edn-roundtrip? a)))))
 
 ;; not-empty works
 ;; ---------------------------------------------------------------------------
