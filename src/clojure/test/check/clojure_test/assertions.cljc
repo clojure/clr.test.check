@@ -41,7 +41,12 @@
      (check-results m#)))
 
 
-#?(:cljr                                                                                  ;;; changed :clj to :cljr
+#?(:default                                                                                  ;;; changed :clj to :default
    (defmethod t/assert-expr 'clojure.test.check.clojure-test/check?
      [_ form]
-     (check? _ form)))
+     (check? _ form))
+   :cljs
+   (when (exists? js/cljs.test$macros)
+     (defmethod js/cljs.test$macros.assert_expr 'clojure.test.check.clojure-test/check?
+       [_ msg form]
+       (clojure.test.check.clojure-test.assertions/check? msg form))))
