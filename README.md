@@ -15,6 +15,7 @@ Nuget reference:
 Leiningen/Clojars reference:
 
    [org.clojure.clr/test.check "0.9.0"]
+   [org.clojure.clr/test.check "0.10.0"]
 
    
 ## Notes on the ported code

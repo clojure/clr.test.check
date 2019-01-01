@@ -10,8 +10,8 @@
     <projectUrl>https://github.com/clojure/clr.test.check</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Port of test.check to ClojureCLR, version 0.9.0</releaseNotes>
-    <copyright>Copyright David Miller 2016</copyright>
+    <releaseNotes>Port of test.check to ClojureCLR, version 0.10.0-alpha3</releaseNotes>
+    <copyright>Copyright David Miller 2019</copyright>
     <tags>Clojure ClojureCLR</tags>
   </metadata>
 </package>
