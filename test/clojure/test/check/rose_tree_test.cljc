@@ -9,10 +9,9 @@
 
 (ns clojure.test.check.rose-tree-test
   (:require [clojure.test.check.generators :as gen]
-            [clojure.test.check.properties :as prop #?@(:cljs [:include-macros true])]
+            [clojure.test.check.properties :as prop]
             [clojure.test.check.rose-tree :as rose]
-            [clojure.test.check.clojure-test :as ct
-             #?(:default :refer :cljs :refer-macros) (defspec)]))                          ;;; change :clj to :default
+            [clojure.test.check.clojure-test :as ct :refer [defspec]]))
 
 (defn depth-one-children
   [rose]

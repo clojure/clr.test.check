@@ -20,9 +20,8 @@
             #?(:clj  [clojure.test :as test :refer :all]                                                                ;;; Added :cljr clause
                :cljr [clojure.test :as test :refer :all])
             [clojure.test.check.generators :as gen]
-            [clojure.test.check.properties :as prop #?@(:cljs [:include-macros true])]               
-            [clojure.test.check.clojure-test :as ct #?@(:default  [:refer (defspec)]                           ;;; changed :clj to :default
-                                                        :cljs [:refer-macros (defspec)])]))
+            [clojure.test.check.properties :as prop]
+            [clojure.test.check.clojure-test :as ct :refer [defspec]]))
 
 (declare ^:dynamic test-report)
 

@@ -15,12 +15,12 @@
             #?(:clj [clojure.test :refer :all]
                :cljr [clojure.test :refer :all])                                                          ;;; Added :cljr clause
             [clojure.test.check :as tc]
-            [clojure.test.check.generators :as gen #?@(:cljs [:include-macros true])]
-            [clojure.test.check.properties :as prop #?@(:cljs [:include-macros true])]
+            [clojure.test.check.generators :as gen]
+            [clojure.test.check.properties :as prop]
             [clojure.test.check.rose-tree :as rose]
             [clojure.test.check.random :as random]
             [clojure.test.check.results :as results]
-            [clojure.test.check.clojure-test :as ct #?(:default :refer :cljs :refer-macros) (defspec)]    ;;; Changed :clj to :default
+            [clojure.test.check.clojure-test :as ct :refer [defspec]]
 			#?(:cljr [clojure.test.check.test-specs :as specs])                                            ;;; Changed :clj to :cljr
             #?(:cljs [clojure.test.check.random.longs :as rl])			
             #?(:default  [clojure.edn :as edn]                                                            ;;; Changed :clj to :default
