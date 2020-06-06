@@ -1,64 +1,33 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5A4A98D0-4B25-42E6-B3C2-5D218AD91611}</ProjectGuid>
+    <TargetFrameworks>net461;netstandard2.1</TargetFrameworks>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>clojure</RootNamespace>
-    <AssemblyName>clojure.test.check</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="test\check\random.clj" />
   </ItemGroup>
+  <PropertyGroup>
+    <Title>clojure.test.check</Title>
+    <Product>clojure.test.check</Product>
+    <AssemblyTitle>clojure.test.check</AssemblyTitle>
+    <Description>Property-based testing of Clojure codea</Description>
+    <Copyright>Copyright © Rich Hickey, David Miller 2020</Copyright>
+    <Company>ClojureCLR contributors</Company>
+    <Version>0.10.0</Version>
+  </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="test\check.cljc" />
     <EmbeddedResource Include="test\check\clojure_test.cljc" />
     <EmbeddedResource Include="test\check\generators.cljc" />
     <EmbeddedResource Include="test\check\properties.cljc" />
     <EmbeddedResource Include="test\check\rose_tree.cljc" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="test\check\impl.cljc" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="test\check\results.cljc" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="test\check\clojure_test\assertions.cljc" />
     <EmbeddedResource Include="test\check\clojure_test\cljs.cljc" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
 </Project>
