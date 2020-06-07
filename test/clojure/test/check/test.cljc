@@ -653,7 +653,7 @@
        0 100
        -100 0
        0 Int64/MaxValue                                                        ;;; Long/MAX_VALUE
-       Int64/MinValue Int64/MaxValue)))                                         ;;; Long/MIN_VALUE Long/MAX_VALUE  
+       Int64/MinValue Int64/MaxValue)))                                        ;;; Long/MIN_VALUE Long/MAX_VALUE  
 
 ;; edn rountrips
 ;; ---------------------------------------------------------------------------
@@ -662,9 +662,17 @@
   [value]
   (= value (-> value prn-str edn/read-string)))
 
+(def infinity-syntax?
+  (edn-roundtrip? Double/PositiveInfinity))                                    ;;; POSITIVE_INFINITY
+  
 (defspec edn-roundtrips 200
   (prop/for-all [a gen/any-equatable]
-    (edn-roundtrip? a)))
+    (or (edn-roundtrip? a)
+        ;; this keeps the tests passing for clojure 1.8 and older
+        (and (not infinity-syntax?)
+             (->> a
+                  (tree-seq coll? seq)
+                  (some #{Double/PositiveInfinity Double/NegativeInfinity}))))))      ;;; POSITIVE_INFINITY NEGATIVE_INFINITY
 
 ;; not-empty works
 ;; ---------------------------------------------------------------------------
