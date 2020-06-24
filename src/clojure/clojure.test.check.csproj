@@ -5,29 +5,30 @@
     <RootNamespace>clojure</RootNamespace>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
   </PropertyGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="test\check\random.clj" />
-  </ItemGroup>
   <PropertyGroup>
+    <PackageId>clojure.test.check</PackageId>
     <Title>clojure.test.check</Title>
     <Product>clojure.test.check</Product>
     <AssemblyTitle>clojure.test.check</AssemblyTitle>
     <Description>Property-based testing of Clojure codea</Description>
     <Copyright>Copyright © Rich Hickey, David Miller 2020</Copyright>
     <Company>ClojureCLR contributors</Company>
-    <Version>1.0.0</Version>
+    <Authors>dmiller</Authors>
+    <PackageLicenseExpression>EPL-1.0</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/clojure/clr.test.check</RepositoryUrl>
+    <PackageTags>Clojure;ClojureCLR</PackageTags>
+    <Version>1.0.0.1</Version>
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="test\check.cljc" />
     <EmbeddedResource Include="test\check\clojure_test.cljc" />
     <EmbeddedResource Include="test\check\generators.cljc" />
     <EmbeddedResource Include="test\check\properties.cljc" />
+    <EmbeddedResource Include="test\check\results.cljc" />
     <EmbeddedResource Include="test\check\rose_tree.cljc" />
     <EmbeddedResource Include="test\check\impl.cljc" />
     <EmbeddedResource Include="test\check\clojure_test\assertions.cljc" />
     <EmbeddedResource Include="test\check\clojure_test\cljs.cljc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\" />
+    <EmbeddedResource Include="test\check\random.clj" />
   </ItemGroup>
 </Project>
