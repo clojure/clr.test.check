@@ -1,0 +1,4 @@
+{
+  :deps {}
+  :paths {"src/main/clojure"}
+}
