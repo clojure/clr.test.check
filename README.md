@@ -8,18 +8,23 @@ From the original's README:
 
 ## Releases
 
+[clj/deps.edn](https://clojure.org/guides/deps_edn) dependency information:
+```clojure
+io.github.clojure/clr.test.check {:git/tag "TBD"  :git/sha "TBD"}
+```
+
 Nuget reference:
 
-    PM> Install-Package clojure.test.check
+```
+Install-Package clojure.test.check  -Version 1.1.1
+```
 
 Leiningen/Clojars reference:
 
-   [org.clojure.clr/test.check "1.1.1"]
+```
+[org.clojure.clr/test.check "1.1.1"]
+```
 
-   
-## Notes on the ported code
-
-None, so far.
 
 ## Contributing
 
@@ -31,6 +36,6 @@ for details.
 
 Original:
 
-> Copyright © 2014 Rich Hickey, Reid Draper and contributors
+> Copyright © Rich Hickey, Reid Draper and contributors
 
 Distributed under the Eclipse Public License, the same as Clojure.
