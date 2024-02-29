@@ -10,7 +10,7 @@ From the original's README:
 
 [clj/deps.edn](https://clojure.org/guides/deps_edn) dependency information:
 ```clojure
-io.github.clojure/clr.test.check {:git/tag "TBD"  :git/sha "TBD"}
+io.github.clojure/clr.test.check {:git/tag "v1.1.1"  :git/sha "3eaa024"}
 ```
 
 Nuget reference:
