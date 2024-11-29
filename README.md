@@ -16,13 +16,13 @@ io.github.clojure/clr.test.check {:git/tag "v1.1.2"  :git/sha "26f34e6"}
 Nuget reference:
 
 ```
-Install-Package clojure.test.check  -Version 1.1.1
+Install-Package clojure.test.check  -Version 1.1.2
 ```
 
 Leiningen/Clojars reference:
 
 ```
-[org.clojure.clr/test.check "1.1.1"]
+[org.clojure.clr/test.check "1.1.2"]
 ```
 
 
