@@ -1,15 +1,12 @@
 This is a [Clojure contrib] project.
 
-__We cannot accept pull requests.__
+Under the Clojure contrib [guidelines], this project cannot accept
+pull requests. All patches must be submitted via [JIRA].
 
-* Issues can be filed in [JIRA]. No [Clojure CA] is required for this.
-* Patches/contributions can be attached to issues in [Jira]. You can [read more
-  about that process](http://dev.clojure.org/display/community/Contributing).
-  Contributions need a [signed CA (Contributor
-  Agreement)](http://clojure.org/contributing).
+See [Contributing] on the Clojure website for
+more information on how to contribute.
 
-Don't hesitate to ask if you have questions about this.
-
-[JIRA]: http://dev.clojure.org/jira/browse/CLRTCHECK
-[Clojure CA]: http://dev.clojure.org/display/community/Contributing
-[Clojure contrib]: http://dev.clojure.org/display/doc/Clojure+Contrib
+[Clojure contrib]: https://clojure.org/community/contrib_libs
+[Contributing]: https://clojure.org/community/contributing
+[JIRA]: https://clojure.atlassian.net/browse/TNS
+[guidelines]: https://clojure.org/community/contrib_howto
