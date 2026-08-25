@@ -177,8 +177,8 @@
       (is (set/subset? #{:result :result-data :seed :failing-size :num-tests :fail :shrunk}
                        (set (keys actual))))
       (is (= false (:result actual))))
-    (is (= more '("")))))                       ;;; (is (nil? more)) -- not sure why we get an extra blank line, and don't care.
-
+      (is (nil? more))))
+	  
 (deftest can-report-shrinking
   (testing "don't emit Shrinking messages by default"
     (let [{:keys [report-counters test-out]} (capture-test-var #'this-is-supposed-to-fail)]
