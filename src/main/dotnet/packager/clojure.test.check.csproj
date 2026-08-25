@@ -12,12 +12,12 @@
 		<AssemblyTitle>clojure.test.check</AssemblyTitle>
 		<Authors>ClojureCLR contributors</Authors>
 		<Description>Property-based testing of Clojure code</Description>
-		<Copyright>Copyright © Rich Hickey, ClojureCLR contributors 2024</Copyright>
+		<Copyright>Copyright © Rich Hickey, ClojureCLR contributors 2026</Copyright>
 		<PackageLicenseExpression>EPL-1.0</PackageLicenseExpression>
 		<RepositoryUrl>https://github.com/clojure/clr.test.check</RepositoryUrl>
 		<Company>ClojureCLR contributors</Company>
 		<PackageTags>Clojure;ClojureCLR</PackageTags>
-		<Version>1.1.2</Version>
+		<Version>1.1.3</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
