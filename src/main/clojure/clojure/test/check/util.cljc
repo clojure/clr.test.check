@@ -9,38 +9,23 @@
 
 (ns clojure.test.check.util)
 
-;; .NET Framework 4.x lacks Int64.Leading
-
+;; .NET Framework 4.x and .Net 6.0 lack Int64.LeadingZeroCount.
 
 ;; Straightforward translation of standard binary-search algorithm for counting leading zeros.
-;; Refer to Hacker's Delight, Figure 5-6.  Adapted from 32 to 64 bits.
+;; Refer to Hacker's Delight, Figure 5-8.  Adapted from 32 to 64 bits.
+;; We use this version because it does not run into trouble with unsigned longs.
+;; NOTE: For use with non-negative values only. (As is the case in our application.)
 
-(defn leading-zero-count ^long [^long x]
-  (let [v (unchecked-long x)]
-    (if (zero? v)
-      64
-      (let [n (long 1)
-            ;; step 1
-            [n v] (if (zero? (bit-shift-right v 32))
-                    [(+ n 32) (bit-shift-left v 32)]
-                    [n v])
-            ;; step 2
-            [n v] (if (zero? (bit-shift-right v 48))
-                    [(+ n 16) (bit-shift-left v 16)]
-                    [n v])
-            ;; step 3
-            [n v] (if (zero? (bit-shift-right v 56))
-                    [(+ n 8) (bit-shift-left v 8)]
-                    [n v])
-            ;; step 4
-            [n v] (if (zero? (bit-shift-right v 60))
-                    [(+ n 4) (bit-shift-left v 4)]
-                    [n v])
-            ;; step 5
-            [n v] (if (zero? (bit-shift-right v 62))
-                    [(+ n 2) (bit-shift-left v 2)]
-                    [n v])]
-        (- n (bit-shift-right v 63))))))
+(defn lzc ^long [^long x]
+  (loop [ x (unchecked-long x)
+          n 64
+          c (int 32)]
+    (if (zero? c)
+	   (- n x)
+	   (let [y (bit-shift-right x c)]
+	      (if (not (zero? y))
+		     (recur y (- n c) (int (bit-shift-right c 1)))
+			 (recur x n (int (bit-shift-right c 1))))))))
 		
 ;; We use a macro to avoid detection at runtime.
 
