@@ -8,24 +8,24 @@ From the original's README:
 
 ## Releases
 
-The current release is 1.1.3.
+The current release is 1.1.4.
 
 
 [clj/deps.edn](https://clojure.org/guides/deps_edn) dependency information:
 ```clojure
-io.github.clojure/clr.test.check {:git/tag "v1.1.3"  :git/sha "7d8dd2a"}
+io.github.clojure/clr.test.check {:git/tag "v1.1.4"  :git/sha "d21dfc3"}
 ```
 
 Nuget reference:
 
 ```
-Install-Package clojure.test.check  -Version 1.1.3
+Install-Package clojure.test.check  -Version 1.1.4
 ```
 
 Leiningen/Clojars reference:
 
 ```
-[org.clojure.clr/test.check "1.1.3"]
+[org.clojure.clr/test.check "1.1.4"]
 ```
 
 
