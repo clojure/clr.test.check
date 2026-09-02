@@ -17,7 +17,7 @@
 		<RepositoryUrl>https://github.com/clojure/clr.test.check</RepositoryUrl>
 		<Company>ClojureCLR contributors</Company>
 		<PackageTags>Clojure;ClojureCLR</PackageTags>
-		<Version>1.1.4-beta1</Version>
+		<Version>1.1.4-beta2</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
