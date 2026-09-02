@@ -16,7 +16,7 @@
 ;; We use this version because it does not run into trouble with unsigned longs.
 ;; NOTE: For use with non-negative values only. (As is the case in our application.)
 
-(defn lzc ^long [^long x]
+(defn leading-zero-count ^long [^long x]
   (loop [ x (unchecked-long x)
           n 64
           c (int 32)]
